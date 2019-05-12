@@ -297,8 +297,12 @@ module LogStash module Inputs class Jdbc < LogStash::Inputs::Base
     return value unless value.is_a?(String)
     column_charset = @columns_charset[column_name]
     if column_charset
-      converter = @converters[column_charset]
-      converter.convert(value)
+      value = value.encode("ISO-8859-1").force_encoding(column_charset)
+      if @charset
+        value.encode(@charset)
+      else
+        value
+      end
     elsif @charset
       converter = @converters[@charset]
       converter.convert(value)
